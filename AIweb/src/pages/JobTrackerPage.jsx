@@ -152,7 +152,7 @@ export default function JobTrackerPage() {
       {error && <div className="banner banner-error" role="alert">{error}</div>}
 
       {apps && apps.length === 0 ? (
-        <div className="card empty-state">
+        <div className="card empty-state tracker-empty">
           <span className="tool-empty-icon"><BriefcaseIcon size={30} /></span>
           <h3>Track your job hunt</h3>
           <p className="muted">Add the jobs you're applying to and move them along as you hear back.</p>
