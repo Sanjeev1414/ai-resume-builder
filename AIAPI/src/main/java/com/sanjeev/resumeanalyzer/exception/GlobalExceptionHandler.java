@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
@@ -86,6 +87,13 @@ public class GlobalExceptionHandler {
         log.warn("Gemini quota/rate limit exceeded: {}", e.getResponseBodyAsString());
         return error(HttpStatus.TOO_MANY_REQUESTS,
                 "The AI is busy right now (free usage limit reached). Please wait a minute and try again.");
+    }
+
+    @ExceptionHandler(HttpServerErrorException.ServiceUnavailable.class)
+    public ResponseEntity<Map<String, String>> aiOverloaded(HttpServerErrorException.ServiceUnavailable e) {
+        // Gemini returns 503 when the model is under high demand; it usually passes within minutes
+        log.warn("Gemini model overloaded: {}", e.getResponseBodyAsString());
+        return error(HttpStatus.SERVICE_UNAVAILABLE, "The AI is busy right now. Please try again in a minute.");
     }
 
     @ExceptionHandler(RestClientResponseException.class)

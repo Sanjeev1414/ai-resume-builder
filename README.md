@@ -23,7 +23,7 @@ practise interview questions, build an ATS-friendly resume and track your job ap
 |---|---|---|
 | Frontend | [`AIweb/`](AIweb) | React 18, React Router 6, Vite |
 | Backend | [`AIAPI/`](AIAPI) | Java 17, Spring Boot 3.3, Spring Security (JWT), Spring Data JPA, Java Mail |
-| AI | - | Google Gemini API (`gemini-3.8-flash`, structured JSON outputs) |
+| AI | - | Google Gemini API (`gemini-3.6-flash`, structured JSON outputs) |
 | Database | [`database/`](database) | H2 (local default), MySQL 8, PostgreSQL (production) |
 | Hosting | - | GitHub Pages (frontend), Render (backend + PostgreSQL) |
 
@@ -188,7 +188,7 @@ They also run automatically on GitHub for every push.
 | Variable | Default | Meaning |
 |---|---|---|
 | `GEMINI_API_KEY` | - | Google Gemini key (required for AI features) |
-| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model to use |
+| `GEMINI_MODEL` | `gemini-3.6-flash` | Gemini model to use |
 | `JWT_SECRET` | random per run | Signs login tokens - 32+ characters |
 | `SPRING_PROFILES_ACTIVE` | (H2) | `mysql` or `postgres` |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | - | Database location (postgres profile) |
