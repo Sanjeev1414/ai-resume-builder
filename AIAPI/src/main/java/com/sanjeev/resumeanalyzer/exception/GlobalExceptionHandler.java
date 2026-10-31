@@ -74,32 +74,35 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
     }
 
-    @ExceptionHandler(HttpClientErrorException.Unauthorized.class)
-    public ResponseEntity<Map<String, String>> badApiKey(HttpClientErrorException.Unauthorized e) {
-        log.error("OpenAI authentication failed - check OPENAI_API_KEY");
+    @ExceptionHandler({HttpClientErrorException.Unauthorized.class, HttpClientErrorException.Forbidden.class})
+    public ResponseEntity<Map<String, String>> badApiKey(HttpClientErrorException e) {
+        log.error("Gemini authentication failed - check GEMINI_API_KEY: {}", e.getResponseBodyAsString());
         return error(HttpStatus.SERVICE_UNAVAILABLE, "The AI service is not configured correctly.");
     }
 
     @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
     public ResponseEntity<Map<String, String>> rateLimited(HttpClientErrorException.TooManyRequests e) {
-        if (e.getResponseBodyAsString().contains("insufficient_quota")) {
-            log.error("OpenAI account has no credits left - add billing at https://platform.openai.com/settings/organization/billing");
-            return error(HttpStatus.SERVICE_UNAVAILABLE,
-                    "The AI service is temporarily unavailable (out of credits). Please try again later.");
-        }
-        log.warn("OpenAI rate limit exceeded: {}", e.getResponseBodyAsString());
-        return error(HttpStatus.TOO_MANY_REQUESTS, "Too many requests right now. Please wait a minute and try again.");
+        // Gemini free tier has per-minute and per-day request limits
+        log.warn("Gemini quota/rate limit exceeded: {}", e.getResponseBodyAsString());
+        return error(HttpStatus.TOO_MANY_REQUESTS,
+                "The AI is busy right now (free usage limit reached). Please wait a minute and try again.");
     }
 
     @ExceptionHandler(RestClientResponseException.class)
     public ResponseEntity<Map<String, String>> aiError(RestClientResponseException e) {
-        log.error("OpenAI API error (status {}): {}", e.getStatusCode().value(), e.getResponseBodyAsString());
+        String body = e.getResponseBodyAsString();
+        // Gemini reports a wrong key as 400 API_KEY_INVALID rather than 401
+        if (body.contains("API_KEY_INVALID")) {
+            log.error("Gemini rejected the API key - check GEMINI_API_KEY");
+            return error(HttpStatus.SERVICE_UNAVAILABLE, "The AI service is not configured correctly.");
+        }
+        log.error("Gemini API error (status {}): {}", e.getStatusCode().value(), body);
         return error(HttpStatus.BAD_GATEWAY, "The AI service returned an error. Please try again.");
     }
 
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<Map<String, String>> aiUnreachable(ResourceAccessException e) {
-        log.error("Could not reach OpenAI", e);
+        log.error("Could not reach Gemini", e);
         return error(HttpStatus.GATEWAY_TIMEOUT, "The AI service did not respond in time. Please try again.");
     }
 

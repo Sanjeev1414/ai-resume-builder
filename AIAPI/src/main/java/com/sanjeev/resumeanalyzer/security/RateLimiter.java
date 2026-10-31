@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * In-memory sliding-window rate limiter. Protects sign-in from password guessing and the
- * analyze endpoint from running up the OpenAI bill. For several server instances, swap this
+ * analyze endpoint from using up the Gemini quota. For several server instances, swap this
  * for a shared store such as Redis.
  */
 @Component

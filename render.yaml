@@ -1,5 +1,5 @@
 # Render Blueprint: deploys the backend API (Docker) + a PostgreSQL database.
-# In Render: New + -> Blueprint -> pick this GitHub repo -> fill in OPENAI_API_KEY -> Apply.
+# In Render: New + -> Blueprint -> pick this GitHub repo -> fill in GEMINI_API_KEY -> Apply.
 services:
   - type: web
     name: ai-resume-builder-api
@@ -33,7 +33,7 @@ services:
           property: password
       - key: JWT_SECRET
         generateValue: true
-      - key: OPENAI_API_KEY
+      - key: GEMINI_API_KEY
         sync: false          # Render asks you for it - never commit the key
       - key: MAIL_USERNAME
         sync: false          # optional (Gmail address)

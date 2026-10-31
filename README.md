@@ -23,7 +23,7 @@ practise interview questions, build an ATS-friendly resume and track your job ap
 |---|---|---|
 | Frontend | [`AIweb/`](AIweb) | React 18, React Router 6, Vite |
 | Backend | [`AIAPI/`](AIAPI) | Java 17, Spring Boot 3.3, Spring Security (JWT), Spring Data JPA, Java Mail |
-| AI | - | OpenAI API (`gpt-5-mini`, structured JSON outputs) |
+| AI | - | Google Gemini API (`gemini-3.8-flash`, structured JSON outputs) |
 | Database | [`database/`](database) | H2 (local default), MySQL 8, PostgreSQL (production) |
 | Hosting | - | GitHub Pages (frontend), Render (backend + PostgreSQL) |
 
@@ -40,7 +40,7 @@ ai-resume-builder/
 ```
 
 ```
-Browser ──▶ AIweb (GitHub Pages) ──JWT──▶ AIAPI (Render) ──▶ OpenAI API
+Browser ──▶ AIweb (GitHub Pages) ──JWT──▶ AIAPI (Render) ──▶ Gemini API
                                               │
                                               ├──▶ PostgreSQL / MySQL
                                               └──▶ SMTP email (reports, reset links)
@@ -50,8 +50,8 @@ Browser ──▶ AIweb (GitHub Pages) ──JWT──▶ AIAPI (Render) ──�
 
 ## 1. Run it locally
 
-**You need:** Java 17+, Maven 3.9+, Node.js 18+, and an OpenAI API key with credit
-(https://platform.openai.com/api-keys - billing at https://platform.openai.com/settings/organization/billing).
+**You need:** Java 17+, Maven 3.9+, Node.js 18+, and a free Google Gemini API key
+(https://aistudio.google.com/apikey).
 
 ### Backend (AIAPI)
 
@@ -61,7 +61,7 @@ cp .env.example .env        # Windows: copy .env.example .env
 ```
 Open `AIAPI/.env` and fill in:
 ```properties
-OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=your-gemini-key
 JWT_SECRET=any-random-text-at-least-32-characters-long
 # optional - Gmail address + app password to send emails
 MAIL_USERNAME=
@@ -144,7 +144,7 @@ Every table links to `users` with `ON DELETE CASCADE`.
 2. **New +** → **Blueprint** → select this repository. Render reads [`render.yaml`](render.yaml) and creates:
    - `ai-resume-builder-api` - the Spring Boot API (built from `AIAPI/Dockerfile`)
    - `ai-resume-builder-db` - a PostgreSQL database (tables are created on first start)
-3. When asked, paste your **OPENAI_API_KEY** (and optionally `MAIL_USERNAME` / `MAIL_PASSWORD`). `JWT_SECRET` is generated for you.
+3. When asked, paste your **GEMINI_API_KEY** (and optionally `MAIL_USERNAME` / `MAIL_PASSWORD`). `JWT_SECRET` is generated for you.
 4. Click **Apply**. The first build takes ~5-10 minutes.
 5. Check `https://ai-resume-builder-api-o7gk.onrender.com/api/health` → `{"status":"ok"}`.
 
@@ -177,8 +177,8 @@ cd AIAPI
 mvn test
 ```
 22 tests: sign-up/sign-in, password hashing, change/forgot/reset password, rate limiting, protected endpoints,
-per-user data isolation, upload validation, CORS, OpenAI request/response handling, cover letters,
-interview prep, job tracker and resume builder. OpenAI and email are mocked - no keys needed.
+per-user data isolation, upload validation, CORS, Gemini request/response handling, cover letters,
+interview prep, job tracker and resume builder. Gemini and email are mocked - no keys needed.
 They also run automatically on GitHub for every push.
 
 ---
@@ -187,7 +187,8 @@ They also run automatically on GitHub for every push.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `OPENAI_API_KEY` | - | OpenAI key (required for AI features) |
+| `GEMINI_API_KEY` | - | Google Gemini key (required for AI features) |
+| `GEMINI_MODEL` | `gemini-3.8-flash` | Gemini model to use |
 | `JWT_SECRET` | random per run | Signs login tokens - 32+ characters |
 | `SPRING_PROFILES_ACTIVE` | (H2) | `mysql` or `postgres` |
 | `DB_HOST` / `DB_PORT` / `DB_NAME` | - | Database location (postgres profile) |

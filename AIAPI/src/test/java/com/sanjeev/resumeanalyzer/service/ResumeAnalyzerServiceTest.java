@@ -1,7 +1,7 @@
 package com.sanjeev.resumeanalyzer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sanjeev.resumeanalyzer.ai.OpenAiClient;
+import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.exception.AnalysisException;
 import com.sanjeev.resumeanalyzer.model.AnalysisResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,30 +24,31 @@ class ResumeAnalyzerServiceTest {
 
     private static final byte[] PDF = "%PDF-1.4 test".getBytes(StandardCharsets.UTF_8);
     private static final String JOB = "Java developer with Spring Boot and SQL experience for our backend team.";
+    private static final String URL = "https://gemini.test/v1beta/models/gemini-test:generateContent";
 
     private MockRestServiceServer server;
     private ResumeAnalyzerService service;
 
     @BeforeEach
     void setUp() {
-        RestClient.Builder builder = RestClient.builder().baseUrl("https://api.openai.test/v1");
+        RestClient.Builder builder = RestClient.builder().baseUrl("https://gemini.test/v1beta");
         server = MockRestServiceServer.bindTo(builder).build();
-        service = new ResumeAnalyzerService(new OpenAiClient(builder.build(), new ObjectMapper(), "gpt-test"));
+        service = new ResumeAnalyzerService(new GeminiClient(builder.build(), new ObjectMapper(), "gemini-test"));
     }
 
     @Test
-    void sendsPdfWithStrictSchemaAndParsesTheResult() {
+    void sendsPdfWithJsonSchemaAndParsesTheResult() {
         String content = """
                 {"matchScore":140,"atsScore":-5,"summary":"Great","matchedSkills":["Java"],"missingSkills":[],"atsIssues":["No Skills section"],
                  "bulletRewrites":[{"original":"a","improved":"b","reason":"c"}],"suggestions":["x"]}""";
-        server.expect(requestTo("https://api.openai.test/v1/chat/completions"))
+        server.expect(requestTo(URL))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(jsonPath("$.model").value("gpt-test"))
-                .andExpect(jsonPath("$.response_format.json_schema.strict").value(true))
-                .andExpect(jsonPath("$.messages[1].content[0].type").value("file"))
-                .andExpect(jsonPath("$.messages[1].content[0].file.file_data").value(
-                        org.hamcrest.Matchers.startsWith("data:application/pdf;base64,")))
-                .andRespond(withSuccess(completion(content, "stop", null), MediaType.APPLICATION_JSON));
+                .andExpect(jsonPath("$.generationConfig.responseMimeType").value("application/json"))
+                .andExpect(jsonPath("$.generationConfig.responseJsonSchema.type").value("object"))
+                .andExpect(jsonPath("$.systemInstruction.parts[0].text").isNotEmpty())
+                .andExpect(jsonPath("$.contents[0].parts[0].inlineData.mimeType").value("application/pdf"))
+                .andExpect(jsonPath("$.contents[0].parts[0].inlineData.data").isNotEmpty())
+                .andRespond(withSuccess(reply(content, "STOP"), MediaType.APPLICATION_JSON));
 
         AnalysisResult result = service.analyze(PDF, JOB);
 
@@ -60,9 +61,19 @@ class ResumeAnalyzerServiceTest {
     }
 
     @Test
-    void refusalBecomesAFriendlyError() {
-        server.expect(requestTo("https://api.openai.test/v1/chat/completions"))
-                .andRespond(withSuccess(completion(null, "stop", "I can't help with that."), MediaType.APPLICATION_JSON));
+    void safetyBlockBecomesAFriendlyError() {
+        server.expect(requestTo(URL))
+                .andRespond(withSuccess(reply(null, "SAFETY"), MediaType.APPLICATION_JSON));
+
+        assertThatThrownBy(() -> service.analyze(PDF, JOB))
+                .isInstanceOf(AnalysisException.class)
+                .hasMessageContaining("declined");
+    }
+
+    @Test
+    void blockedPromptBecomesAFriendlyError() {
+        server.expect(requestTo(URL))
+                .andRespond(withSuccess("{\"promptFeedback\":{\"blockReason\":\"SAFETY\"}}", MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> service.analyze(PDF, JOB))
                 .isInstanceOf(AnalysisException.class)
@@ -71,23 +82,23 @@ class ResumeAnalyzerServiceTest {
 
     @Test
     void truncatedReplyBecomesAFriendlyError() {
-        server.expect(requestTo("https://api.openai.test/v1/chat/completions"))
-                .andRespond(withSuccess(completion("{\"matchScore\":", "length", null), MediaType.APPLICATION_JSON));
+        server.expect(requestTo(URL))
+                .andRespond(withSuccess(reply("{\"matchScore\":", "MAX_TOKENS"), MediaType.APPLICATION_JSON));
 
         assertThatThrownBy(() -> service.analyze(PDF, JOB))
                 .isInstanceOf(AnalysisException.class)
                 .hasMessageContaining("cut off");
     }
 
-    private static String completion(String content, String finishReason, String refusal) {
+    private static String reply(String text, String finishReason) {
         ObjectMapper mapper = new ObjectMapper();
-        var message = mapper.createObjectNode().put("role", "assistant");
-        message.put("content", content);
-        message.put("refusal", refusal);
-        var choice = mapper.createObjectNode().put("finish_reason", finishReason);
-        choice.set("message", message);
+        var candidate = mapper.createObjectNode().put("finishReason", finishReason);
+        if (text != null) {
+            var content = candidate.putObject("content").put("role", "model");
+            content.putArray("parts").addObject().put("text", text);
+        }
         var root = mapper.createObjectNode();
-        root.putArray("choices").add(choice);
+        root.putArray("candidates").add(candidate);
         return root.toString();
     }
 }

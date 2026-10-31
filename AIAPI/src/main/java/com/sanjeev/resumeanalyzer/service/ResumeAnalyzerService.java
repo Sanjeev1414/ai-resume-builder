@@ -1,6 +1,6 @@
 package com.sanjeev.resumeanalyzer.service;
 
-import com.sanjeev.resumeanalyzer.ai.OpenAiClient;
+import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.model.AnalysisResult;
 import org.springframework.stereotype.Service;
 
@@ -29,17 +29,17 @@ public class ResumeAnalyzerService {
             in the resume, use a placeholder like [X%] so the candidate can fill in the real number.
             """;
 
-    private final OpenAiClient openAi;
+    private final GeminiClient gemini;
 
-    public ResumeAnalyzerService(OpenAiClient openAi) {
-        this.openAi = openAi;
+    public ResumeAnalyzerService(GeminiClient gemini) {
+        this.gemini = gemini;
     }
 
     public AnalysisResult analyze(byte[] resumePdf, String jobDescription) {
         String instructions = "Analyze the attached resume against this job description:\n\n"
                 + "<job_description>\n" + jobDescription.strip() + "\n</job_description>";
 
-        AnalysisResult result = openAi.structured(SYSTEM_PROMPT, resumePdf, instructions,
+        AnalysisResult result = gemini.structured(SYSTEM_PROMPT, resumePdf, instructions,
                 "resume_analysis", AnalysisSchema.SCHEMA, AnalysisResult.class);
 
         return new AnalysisResult(clamp(result.matchScore()),

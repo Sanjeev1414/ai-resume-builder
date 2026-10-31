@@ -1,7 +1,7 @@
 package com.sanjeev.resumeanalyzer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sanjeev.resumeanalyzer.ai.OpenAiClient;
+import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.coverletter.CoverLetterController.AiLetter;
 import com.sanjeev.resumeanalyzer.interview.InterviewPrepController.PrepResult;
 import com.sanjeev.resumeanalyzer.interview.InterviewPrepController.Question;
@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Cover letters, interview prep, job tracker and resume builder. OpenAI is mocked. */
+/** Cover letters, interview prep, job tracker and resume builder. Gemini is mocked. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -46,12 +46,12 @@ class FeaturesIntegrationTest {
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper json;
 
-    @MockBean private OpenAiClient openAi;
+    @MockBean private GeminiClient gemini;
     @MockBean private JavaMailSender mailSender;
 
     @Test
     void coverLetterIsGeneratedSavedEditedAndDeleted() throws Exception {
-        when(openAi.structured(anyString(), any(), anyString(), eq("cover_letter"), any(), eq(AiLetter.class)))
+        when(gemini.structured(anyString(), any(), anyString(), eq("cover_letter"), any(), eq(AiLetter.class)))
                 .thenReturn(new AiLetter("Application for Java Developer", "Dear Hiring Manager,\n\nI am excited..."));
         String token = register();
 
@@ -89,7 +89,7 @@ class FeaturesIntegrationTest {
 
     @Test
     void interviewPrepWorksWithoutAResume() throws Exception {
-        when(openAi.structured(anyString(), any(), anyString(), eq("interview_prep"), any(), eq(PrepResult.class)))
+        when(gemini.structured(anyString(), any(), anyString(), eq("interview_prep"), any(), eq(PrepResult.class)))
                 .thenReturn(new PrepResult(List.of("Spring Boot"), List.of(
                         new Question("Technical", "What is dependency injection?", "Checks basics",
                                 List.of("Define it", "Give an example"), "Dependency injection is..."))));

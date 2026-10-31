@@ -52,7 +52,7 @@ class ApiIntegrationTest {
     @Autowired private ObjectMapper json;
     @Autowired private UserRepository users;
 
-    @MockBean private ResumeAnalyzerService analyzer;  // no real OpenAI calls in tests
+    @MockBean private ResumeAnalyzerService analyzer;  // no real Gemini calls in tests
     @MockBean private JavaMailSender mailSender;        // no real emails in tests
     @SpyBean private EmailService emailService;         // lets tests read the reset link
 

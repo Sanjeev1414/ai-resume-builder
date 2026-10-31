@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * JSON schema for {@link com.sanjeev.resumeanalyzer.model.AnalysisResult}, sent to OpenAI as a
- * strict structured output. Strict mode requires every property to be listed in "required"
- * and "additionalProperties" to be false. Descriptions double as instructions for the model.
+ * JSON schema for {@link com.sanjeev.resumeanalyzer.model.AnalysisResult}, sent to Gemini as the
+ * structured output schema. Every property is listed in "required" and "additionalProperties"
+ * is false so the reply always has the full shape. Descriptions double as instructions for the model.
  */
 final class AnalysisSchema {
 

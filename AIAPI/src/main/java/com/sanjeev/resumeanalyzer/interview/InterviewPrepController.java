@@ -2,7 +2,7 @@ package com.sanjeev.resumeanalyzer.interview;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sanjeev.resumeanalyzer.ai.OpenAiClient;
+import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.ai.Schemas;
 import com.sanjeev.resumeanalyzer.ai.Uploads;
 import com.sanjeev.resumeanalyzer.exception.NotFoundException;
@@ -69,17 +69,17 @@ public class InterviewPrepController {
     public record PrepSummary(Long id, String jobTitle, String companyName, int questionCount, Instant createdAt) {
     }
 
-    private final OpenAiClient openAi;
+    private final GeminiClient gemini;
     private final InterviewPrepRepository preps;
     private final CurrentUser currentUser;
     private final RateLimiter rateLimiter;
     private final ObjectMapper objectMapper;
     private final int aiRequestsPerHour;
 
-    public InterviewPrepController(OpenAiClient openAi, InterviewPrepRepository preps, CurrentUser currentUser,
+    public InterviewPrepController(GeminiClient gemini, InterviewPrepRepository preps, CurrentUser currentUser,
                                    RateLimiter rateLimiter, ObjectMapper objectMapper,
                                    @Value("${app.rate-limit.analyses-per-hour}") int aiRequestsPerHour) {
-        this.openAi = openAi;
+        this.gemini = gemini;
         this.preps = preps;
         this.currentUser = currentUser;
         this.rateLimiter = rateLimiter;
@@ -106,7 +106,7 @@ public class InterviewPrepController {
                 + (company != null ? "Company: " + company + "\n" : "")
                 + (pdf == null ? "No resume attached.\n" : "")
                 + "\n<job_description>\n" + jd + "\n</job_description>";
-        PrepResult result = openAi.structured(SYSTEM_PROMPT, pdf, prompt, "interview_prep", SCHEMA, PrepResult.class);
+        PrepResult result = gemini.structured(SYSTEM_PROMPT, pdf, prompt, "interview_prep", SCHEMA, PrepResult.class);
 
         InterviewPrep saved = preps.save(new InterviewPrep(user, title, company, toJson(result)));
         return new PrepView(saved.getId(), title, company, saved.getCreatedAt(), result);

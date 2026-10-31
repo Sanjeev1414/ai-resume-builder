@@ -1,6 +1,6 @@
 package com.sanjeev.resumeanalyzer.coverletter;
 
-import com.sanjeev.resumeanalyzer.ai.OpenAiClient;
+import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.ai.Schemas;
 import com.sanjeev.resumeanalyzer.ai.Uploads;
 import com.sanjeev.resumeanalyzer.exception.NotFoundException;
@@ -76,16 +76,16 @@ public class CoverLetterController {
             @NotBlank(message = "Letter can't be empty") @Size(max = 10_000) String content) {
     }
 
-    private final OpenAiClient openAi;
+    private final GeminiClient gemini;
     private final CoverLetterRepository letters;
     private final CurrentUser currentUser;
     private final RateLimiter rateLimiter;
     private final int aiRequestsPerHour;
 
-    public CoverLetterController(OpenAiClient openAi, CoverLetterRepository letters, CurrentUser currentUser,
+    public CoverLetterController(GeminiClient gemini, CoverLetterRepository letters, CurrentUser currentUser,
                                  RateLimiter rateLimiter,
                                  @Value("${app.rate-limit.analyses-per-hour}") int aiRequestsPerHour) {
-        this.openAi = openAi;
+        this.gemini = gemini;
         this.letters = letters;
         this.currentUser = currentUser;
         this.rateLimiter = rateLimiter;
@@ -115,7 +115,7 @@ public class CoverLetterController {
                 + (company != null ? "Company: " + company + "\n" : "")
                 + (title != null ? "Job title: " + title + "\n" : "")
                 + "\n<job_description>\n" + jd + "\n</job_description>";
-        AiLetter ai = openAi.structured(SYSTEM_PROMPT, pdf, prompt, "cover_letter", SCHEMA, AiLetter.class);
+        AiLetter ai = gemini.structured(SYSTEM_PROMPT, pdf, prompt, "cover_letter", SCHEMA, AiLetter.class);
 
         CoverLetter saved = letters.save(new CoverLetter(user, company, title, tone,
                 truncate(ai.subject(), 255), ai.letter().strip()));
