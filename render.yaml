@@ -1,0 +1,54 @@
+# Render Blueprint: deploys the backend API (Docker) + a PostgreSQL database.
+# In Render: New + -> Blueprint -> pick this GitHub repo -> fill in OPENAI_API_KEY -> Apply.
+services:
+  - type: web
+    name: ai-resume-builder-api
+    runtime: docker
+    rootDir: AIAPI
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: postgres
+      - key: DB_HOST
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ai-resume-builder-db
+          property: password
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false          # Render asks you for it - never commit the key
+      - key: MAIL_USERNAME
+        sync: false          # optional (Gmail address)
+      - key: MAIL_PASSWORD
+        sync: false          # optional (Gmail app password)
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://sanjeev1414.github.io
+      - key: FRONTEND_URL
+        value: https://sanjeev1414.github.io/ai-resume-builder
+      # Trust Render's proxy headers so rate limits see real client IPs
+      - key: SERVER_FORWARD_HEADERS_STRATEGY
+        value: native
+
+databases:
+  - name: ai-resume-builder-db
+    plan: free
+    databaseName: resume_analyzer
+    user: resume_app

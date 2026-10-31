@@ -1,0 +1,6 @@
+.env
+.DS_Store
+
+# Local tools - never commit
+oracleJdk-27/
+*.jar

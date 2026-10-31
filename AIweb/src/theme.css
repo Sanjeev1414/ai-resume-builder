@@ -1,0 +1,59 @@
+/* Navy + teal colour theme. Loaded last so it overrides the base tokens in styles.css. */
+:root {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --surface-2: #eef2f8;
+  --text: #0f1b33;
+  --muted: #5b6b85;
+  --border: #dfe6f0;
+  --primary: #1e3a8a;          /* navy */
+  --primary-hover: #172e6e;
+  --primary-soft: #e6ecf8;
+  --accent: #14b8a6;           /* teal */
+  --accent-soft: #ccfbf1;
+  --accent-text: #0f766e;
+  --navy-900: #0a1631;
+  --navy-800: #0f2150;
+  --gradient: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 100%);
+  --hero-gradient: linear-gradient(120deg, #0a1631 0%, #1e3a8a 55%, #0f766e 100%);
+  --shadow-lg: 0 12px 40px rgba(15, 33, 80, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #070f22;
+    --surface: #0e1a36;
+    --surface-2: #142347;
+    --text: #e3e9f5;
+    --muted: #93a3c0;
+    --border: #1f3260;
+    --primary: #7aa2ff;
+    --primary-hover: #a3bfff;
+    --primary-soft: #16285a;
+    --accent: #2dd4bf;
+    --accent-soft: #10352f;
+    --accent-text: #5eead4;
+    --gradient: linear-gradient(135deg, #2b4fb8 0%, #2563eb 100%);
+  }
+}
+
+.button-primary { box-shadow: 0 4px 14px rgba(30, 58, 138, 0.35); }
+.button-primary:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(30, 58, 138, 0.45); }
+.brand b { background: linear-gradient(135deg, #1e3a8a, #14b8a6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.eyebrow { color: var(--accent-text); }
+.hero-banner { background: var(--hero-gradient); }
+.hero-text .eyebrow { color: #5eead4; }
+.hero-stat span { color: #99f6e4; }
+.score-good .score-fill { stroke: var(--accent); }
+.tone-primary { background: var(--primary-soft); color: var(--primary); }
+.tone-accent { background: var(--accent-soft); color: var(--accent-text); }
+.step-number { background: var(--accent-soft); color: var(--accent-text); }
+.dropzone:hover, .dropzone:focus-visible, .dropzone.dragging { border-color: var(--accent); background: var(--accent-soft); }
+.dropzone-icon { color: var(--accent-text); }
+.toast-progress { background: linear-gradient(90deg, #1e3a8a, #14b8a6); }
+.avatar { background: linear-gradient(135deg, #1e3a8a, #14b8a6); }
+input:focus, textarea:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+.auth-card .button-primary { background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%); }
+.auth-card .link, .auth-card .button-ghost { color: #1e3a8a; }
+.auth-card input:focus { border-color: #1e3a8a; box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.15); }
+.auth-logo { box-shadow: 0 8px 24px rgba(20, 184, 166, 0.35); }
