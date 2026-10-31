@@ -47,9 +47,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      # While Settings -> Pages -> Source is "Deploy from a branch", GitHub's own "pages build and
-      # deployment" job also runs on every push and publishes the README instead of the app.
-      # Waiting makes this deploy finish last. Safe to remove once Source is set to "GitHub Actions".
-      - run: sleep 75
       - id: deployment
         uses: actions/deploy-pages@v4
