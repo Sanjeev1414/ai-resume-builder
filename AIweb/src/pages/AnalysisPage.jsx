@@ -4,6 +4,7 @@ import { fetchAnalysis } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
 import Results from '../components/Results.jsx';
+import TailoredResume from '../components/TailoredResume.jsx';
 import { ArrowLeftIcon, MailIcon } from '../components/Icons.jsx';
 
 /** /analyses/:id - one saved report. Uses the result passed from the dashboard, or loads it. */
@@ -50,6 +51,7 @@ export default function AnalysisPage() {
         <div className="banner banner-success"><MailIcon size={18} /> A copy of this report is on its way to {user.email}.</div>
       )}
       <Results result={analysis.result} />
+      <TailoredResume analysisId={analysis.id} />
     </>
   );
 }

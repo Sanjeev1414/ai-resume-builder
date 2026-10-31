@@ -269,6 +269,54 @@ select, input[type='date'], input[type='url'] {
 .rp-row span { color: #374151; white-space: nowrap; font-size: 9.5pt; }
 .rp-sub { color: #4b5563; font-size: 9.5pt; }
 
+/* ============ Resume templates (all single column, ATS-friendly) ============ */
+.resume-paper.tpl-modern h1 { text-align: left; color: #0f766e; }
+.resume-paper.tpl-modern .rp-title, .resume-paper.tpl-modern .rp-contact { text-align: left; }
+.resume-paper.tpl-modern h2 { padding: 0 0 0 8px; border-bottom: none; border-left: 3px solid #0f766e; color: #0f766e; text-transform: none; letter-spacing: 0; }
+.resume-paper.tpl-compact { padding: 36px 40px; font-family: Georgia, 'Times New Roman', serif; font-size: 10pt; line-height: 1.35; }
+.resume-paper.tpl-compact h1 { font-size: 18pt; color: #111827; }
+.resume-paper.tpl-compact h2 { margin: 10px 0 4px; border-bottom: 1px solid #111827; color: #111827; }
+.resume-paper.tpl-compact .rp-item { margin-bottom: 5px; }
+
+.template-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.template-option {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; text-align: left;
+  border: 1.5px solid var(--border); border-radius: 12px; background: var(--surface); color: inherit; font: inherit; cursor: pointer;
+}
+.template-option:hover { border-color: var(--primary); }
+.template-option.selected { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); }
+.template-option strong { display: block; font-size: 0.92rem; }
+.template-option small { display: block; color: var(--muted); font-size: 0.78rem; line-height: 1.3; }
+.template-thumb { flex: none; display: flex; flex-direction: column; gap: 3px; width: 34px; height: 44px; padding: 5px; border: 1px solid var(--border); border-radius: 4px; background: #fff; }
+.template-thumb i { display: block; height: 3px; border-radius: 2px; background: #cbd5e1; }
+.template-thumb i:first-child { height: 4px; }
+.thumb-classic i:first-child { width: 60%; margin: 0 auto; background: #1e3a8a; }
+.thumb-modern i:first-child { width: 60%; background: #0f766e; }
+.thumb-modern i:nth-child(2) { border-left: 2px solid #0f766e; }
+.thumb-compact { gap: 2px; }
+.thumb-compact i:first-child { width: 55%; margin: 0 auto; background: #111827; }
+
+.tailored { margin-top: 24px; }
+.tailored-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; max-width: 760px; }
+.tailored .label { margin-bottom: 8px; }
+.tailored-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.tailored-preview { margin-top: 18px; max-height: 900px; overflow: auto; padding: 16px; border-radius: 12px; background: var(--surface-2); }
+.tailored-preview .resume-paper { max-width: 820px; margin: 0 auto; }
+
+@media print {
+  /* "Download PDF": print only the .print-root resume. Everything not on the path to it is removed
+     from layout (display:none), so long pages don't add blank sheets after the resume. */
+  body.print-isolate :not(:has(.print-root)):not(.print-root):not(.print-root *) { display: none !important; }
+  body.print-isolate :has(.print-root), body.print-isolate .print-root {
+    display: block !important; position: static !important; margin: 0 !important; padding: 0 !important;
+    border: 0 !important; box-shadow: none !important; background: none !important;
+    max-height: none !important; overflow: visible !important;
+  }
+  html:has(body.print-isolate), body.print-isolate { background: #fff !important; }
+  body.print-isolate .resume-paper { position: static; max-width: none; margin: 0; }
+  .resume-paper h2, .rp-item { break-inside: avoid; }
+}
+
 @media print {
   @page { size: A4; margin: 12mm; }
   body { background: #fff; }
@@ -285,6 +333,8 @@ select, input[type='date'], input[type='url'] {
 }
 @media (max-width: 680px) {
   .field-row, .field-row.three { grid-template-columns: 1fr; }
+  .template-picker { grid-template-columns: 1fr; }
+  .tailored-preview { padding: 0; }
   .letter-toolbar { flex-direction: column; align-items: stretch; }
   .letter-body { padding: 16px; min-height: 360px; }
   .resume-paper { padding: 24px 20px; }

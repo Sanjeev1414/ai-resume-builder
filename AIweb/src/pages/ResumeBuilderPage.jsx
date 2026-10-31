@@ -3,6 +3,7 @@ import { fetchResumeDraft, saveResumeDraft } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
 import { CheckIcon, DownloadIcon, PlusIcon, TrashIcon } from '../components/Icons.jsx';
+import ResumePreview, { printResume, TemplatePicker } from '../components/ResumePreview.jsx';
 
 const NEW_EXPERIENCE = { role: '', company: '', location: '', start: '', end: '', bullets: '' };
 const NEW_PROJECT = { name: '', tech: '', link: '', bullets: '' };
@@ -12,67 +13,8 @@ function emptyResume(user) {
   return {
     fullName: user.name, title: '', email: user.email, phone: '', location: '', linkedin: '', website: '',
     summary: '', skills: '', experience: [{ ...NEW_EXPERIENCE }], projects: [], education: [{ ...NEW_EDUCATION }],
-    certifications: '',
+    certifications: '', template: 'classic',
   };
-}
-
-const lines = (text) => (text ?? '').split('\n').map((l) => l.replace(/^[-•*]\s*/, '').trim()).filter(Boolean);
-
-/** Live ATS-friendly preview: single column, standard headings, plain text. */
-function ResumePreview({ r }) {
-  const contact = [r.email, r.phone, r.location, r.linkedin, r.website].filter(Boolean);
-  return (
-    <div className="resume-paper">
-      <h1>{r.fullName || 'Your Name'}</h1>
-      {r.title && <p className="rp-title">{r.title}</p>}
-      {contact.length > 0 && <p className="rp-contact">{contact.join(' | ')}</p>}
-
-      {r.summary && (<><h2>Summary</h2><p>{r.summary}</p></>)}
-
-      {r.skills && (<><h2>Skills</h2><p>{r.skills}</p></>)}
-
-      {r.experience.some((e) => e.role || e.company) && (
-        <>
-          <h2>Experience</h2>
-          {r.experience.filter((e) => e.role || e.company).map((e, i) => (
-            <div key={i} className="rp-item">
-              <div className="rp-row"><strong>{e.role}{e.company && `, ${e.company}`}</strong><span>{[e.start, e.end].filter(Boolean).join(' - ')}</span></div>
-              {e.location && <p className="rp-sub">{e.location}</p>}
-              <ul>{lines(e.bullets).map((b, j) => <li key={j}>{b}</li>)}</ul>
-            </div>
-          ))}
-        </>
-      )}
-
-      {r.projects.some((p) => p.name) && (
-        <>
-          <h2>Projects</h2>
-          {r.projects.filter((p) => p.name).map((p, i) => (
-            <div key={i} className="rp-item">
-              <div className="rp-row"><strong>{p.name}{p.tech && ` | ${p.tech}`}</strong><span>{p.link}</span></div>
-              <ul>{lines(p.bullets).map((b, j) => <li key={j}>{b}</li>)}</ul>
-            </div>
-          ))}
-        </>
-      )}
-
-      {r.education.some((e) => e.degree || e.school) && (
-        <>
-          <h2>Education</h2>
-          {r.education.filter((e) => e.degree || e.school).map((e, i) => (
-            <div key={i} className="rp-item">
-              <div className="rp-row"><strong>{e.degree}{e.school && `, ${e.school}`}</strong><span>{e.year}</span></div>
-              {e.score && <p className="rp-sub">{e.score}</p>}
-            </div>
-          ))}
-        </>
-      )}
-
-      {lines(r.certifications).length > 0 && (
-        <><h2>Certifications</h2><ul>{lines(r.certifications).map((c, i) => <li key={i}>{c}</li>)}</ul></>
-      )}
-    </div>
-  );
 }
 
 function ListSection({ title, items, template, onChange, render }) {
@@ -132,10 +74,15 @@ export default function ResumeBuilderPage() {
       <div className="builder-form card">
         <div className="builder-toolbar">
           <span className="save-status">{status === 'Saved' && <CheckIcon size={16} />} {status || 'Changes save automatically'}</span>
-          <button type="button" className="button button-primary button-small" onClick={() => window.print()}>
+          <button type="button" className="button button-primary button-small" onClick={() => printResume(`${resume.fullName || 'My'} Resume`)}>
             <DownloadIcon size={16} /> Download PDF
           </button>
         </div>
+
+        <fieldset className="builder-section">
+          <legend>Template</legend>
+          <TemplatePicker value={resume.template} onChange={(template) => setResume({ ...resume, template })} />
+        </fieldset>
 
         <fieldset className="builder-section">
           <legend>Personal details</legend>
@@ -222,7 +169,7 @@ export default function ResumeBuilderPage() {
 
       <div className="builder-preview">
         <div className="preview-label">Live preview · ATS-friendly layout</div>
-        <ResumePreview r={resume} />
+        <div className="print-root"><ResumePreview r={resume} template={resume.template} /></div>
       </div>
     </div>
   );

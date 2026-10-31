@@ -72,6 +72,16 @@ CREATE TABLE IF NOT EXISTS analyses (
     CONSTRAINT fk_analyses_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 ) ENGINE = InnoDB;
 
+-- The resume PDF behind each analysis, and the AI-tailored resume generated from it (one per analysis).
+CREATE TABLE IF NOT EXISTS analysis_resumes (
+    analysis_id   BIGINT      NOT NULL,
+    pdf           LONGBLOB    NOT NULL,
+    tailored_json LONGTEXT    NULL,
+    tailored_at   DATETIME(6) NULL,
+    PRIMARY KEY (analysis_id),
+    CONSTRAINT fk_analysis_resumes_analysis FOREIGN KEY (analysis_id) REFERENCES analyses (id) ON DELETE CASCADE
+) ENGINE = InnoDB;
+
 -- AI-generated cover letters (editable by the user).
 CREATE TABLE IF NOT EXISTS cover_letters (
     id           BIGINT       NOT NULL AUTO_INCREMENT,

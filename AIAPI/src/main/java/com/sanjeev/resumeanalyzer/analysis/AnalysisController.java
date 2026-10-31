@@ -38,6 +38,7 @@ public class AnalysisController {
 
     private final ResumeAnalyzerService analyzerService;
     private final AnalysisRepository analyses;
+    private final AnalysisResumeRepository resumes;
     private final EmailService emailService;
     private final CurrentUser currentUser;
     private final ObjectMapper objectMapper;
@@ -45,11 +46,12 @@ public class AnalysisController {
     private final int analysesPerHour;
 
     public AnalysisController(ResumeAnalyzerService analyzerService, AnalysisRepository analyses,
-                              EmailService emailService, CurrentUser currentUser, ObjectMapper objectMapper,
+                              AnalysisResumeRepository resumes, EmailService emailService, CurrentUser currentUser, ObjectMapper objectMapper,
                               RateLimiter rateLimiter,
                               @Value("${app.rate-limit.analyses-per-hour}") int analysesPerHour) {
         this.analyzerService = analyzerService;
         this.analyses = analyses;
+        this.resumes = resumes;
         this.emailService = emailService;
         this.currentUser = currentUser;
         this.objectMapper = objectMapper;
@@ -91,6 +93,8 @@ public class AnalysisController {
         AnalysisResult result = analyzerService.analyze(bytes, jd);
         Analysis saved = analyses.save(new Analysis(user, safeFileName(resume.getOriginalFilename()), jd,
                 result.matchScore(), toJson(result)));
+        // Kept so the report can generate a tailored resume later without asking for the file again
+        resumes.save(new AnalysisResume(saved.getId(), bytes));
 
         boolean emailQueued = emailService.isEnabled();
         if (emailQueued) {

@@ -1,6 +1,7 @@
 package com.sanjeev.resumeanalyzer.email;
 
 import com.sanjeev.resumeanalyzer.model.AnalysisResult;
+import com.sanjeev.resumeanalyzer.model.TailoredResume;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -40,6 +41,21 @@ public class EmailService {
     public void sendAnalysisReport(String to, String name, AnalysisResult result) {
         // Email is a bonus - the analysis is already saved, so failures are only logged
         send(to, "Your resume match score: " + result.matchScore() + "/100", buildHtml(name, result));
+    }
+
+    @Async
+    public void sendTailoredResume(String to, String name, AnalysisResult result, TailoredResume resume,
+                                   String template, String reportLink) {
+        String html = "<div style=\"font-family:Arial,sans-serif;max-width:720px;color:#1c2333\">"
+                + "<p>Hi " + esc(name) + ", here is your resume tailored for this job.</p>"
+                + "<p><b>Match score:</b> " + result.matchScore() + " / 100"
+                + (result.atsScore() != null ? " &nbsp;·&nbsp; <b>ATS score:</b> " + result.atsScore() + " / 100" : "")
+                + "</p><p><a href=\"" + esc(reportLink) + "\">Open the full report</a> to download it as a PDF.</p>"
+                + "<div style=\"border:1px solid #d8dee9;border-radius:6px;padding:28px 32px;margin-top:16px\">"
+                + ResumeHtml.render(resume, template) + "</div>"
+                + "<p style=\"color:#5d6779;font-size:13px\">Sent by ResumeAI</p></div>";
+        String who = resume.fullName() == null || resume.fullName().isBlank() ? "Your" : resume.fullName() + "'s";
+        send(to, who + " tailored resume (" + result.matchScore() + "/100 match)", html);
     }
 
     @Async

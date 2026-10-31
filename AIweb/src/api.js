@@ -69,6 +69,15 @@ export const resetPassword = (token, newPassword) => postJson('/api/auth/reset-p
 export const fetchHistory = () => request('/api/analyses');
 export const fetchAnalysis = (id) => request(`/api/analyses/${id}`);
 
+// --- Tailored resume (per analysis) ---
+export const fetchTailoredResume = (id) => request(`/api/analyses/${id}/tailored-resume`);
+export function generateTailoredResume(id, resumeFile) {
+  const form = new FormData();
+  if (resumeFile) form.append('resume', resumeFile);
+  return request(`/api/analyses/${id}/tailored-resume`, { method: 'POST', body: form });
+}
+export const emailTailoredResume = (id, template) => postJson(`/api/analyses/${id}/tailored-resume/email`, { template });
+
 function sendJson(method, path, body) {
   return request(path, {
     method,

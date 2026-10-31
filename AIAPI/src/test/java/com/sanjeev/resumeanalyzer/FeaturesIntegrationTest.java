@@ -5,6 +5,8 @@ import com.sanjeev.resumeanalyzer.ai.GeminiClient;
 import com.sanjeev.resumeanalyzer.coverletter.CoverLetterController.AiLetter;
 import com.sanjeev.resumeanalyzer.interview.InterviewPrepController.PrepResult;
 import com.sanjeev.resumeanalyzer.interview.InterviewPrepController.Question;
+import com.sanjeev.resumeanalyzer.model.AnalysisResult;
+import com.sanjeev.resumeanalyzer.model.TailoredResume;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Cover letters, interview prep, job tracker and resume builder. Gemini is mocked. */
+/** Cover letters, interview prep, tailored resumes, job tracker and resume builder. Gemini is mocked. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -166,6 +168,52 @@ class FeaturesIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content("{\"data\":{\"fullName\":\"A\"}}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void tailoredResumeIsGeneratedFromTheAnalysedPdfSavedAndEmailed() throws Exception {
+        when(gemini.structured(anyString(), any(), anyString(), eq("resume_analysis"), any(), eq(AnalysisResult.class)))
+                .thenReturn(new AnalysisResult(72, 80, "Good fit", List.of("Java"), List.of("AWS"), List.of(),
+                        List.of(), List.of("Add AWS projects")));
+        when(gemini.structured(anyString(), any(), anyString(), eq("tailored_resume"), any(), eq(TailoredResume.class)))
+                .thenReturn(new TailoredResume("Asha Rao", "Java Developer", "asha@example.com", "", "Bengaluru", "", "",
+                        "Java developer with Spring Boot experience.", List.of("Java", "Spring Boot"),
+                        List.of(new TailoredResume.Experience("Developer", "Acme", "", "Jan 2024", "Present",
+                                List.of("Built REST APIs in Spring Boot"))),
+                        List.of(), List.of(new TailoredResume.Education("B.E. CSE", "VTU", "2020 - 2024", "")), List.of()));
+        String token = register();
+
+        String id = json.readTree(mvc.perform(multipart("/api/analyze").file(pdf()).param("jobDescription", JOB)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString()).get("id").asText();
+        String url = "/api/analyses/" + id + "/tailored-resume";
+
+        // The analysed PDF was kept, so no re-upload is needed
+        mvc.perform(get(url).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resume").doesNotExist())
+                .andExpect(jsonPath("$.hasSourceResume").value(true));
+
+        mvc.perform(multipart(url).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.resume.fullName").value("Asha Rao"))
+                .andExpect(jsonPath("$.resume.experience[0].bullets[0]").value("Built REST APIs in Spring Boot"));
+
+        mvc.perform(get(url).header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.resume.title").value("Java Developer"))
+                .andExpect(jsonPath("$.generatedAt").exists());
+
+        mvc.perform(post(url + "/email").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"template\":\"modern\"}"))
+                .andExpect(status().isAccepted());
+        mvc.perform(post(url + "/email").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"template\":\"fancy\"}"))
+                .andExpect(status().isBadRequest());
+
+        String other = register();
+        mvc.perform(get(url).header("Authorization", "Bearer " + other)).andExpect(status().isNotFound());
+        mvc.perform(multipart(url).header("Authorization", "Bearer " + other)).andExpect(status().isNotFound());
     }
 
     private String register() throws Exception {
