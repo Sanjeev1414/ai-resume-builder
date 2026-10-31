@@ -4,7 +4,7 @@ A full-stack career toolkit: analyze your resume against any job post, pass ATS 
 practise interview questions, build an ATS-friendly resume and track your job applications.
 
 **Live demo:** https://sanjeev1414.github.io/ai-resume-builder/
-**API:** https://ai-resume-builder-api.onrender.com/api/health
+**API:** https://ai-resume-builder-api-o7gk.onrender.com/api/health
 
 | Feature | What it does |
 |---|---|
@@ -146,7 +146,7 @@ Every table links to `users` with `ON DELETE CASCADE`.
    - `ai-resume-builder-db` - a PostgreSQL database (tables are created on first start)
 3. When asked, paste your **OPENAI_API_KEY** (and optionally `MAIL_USERNAME` / `MAIL_PASSWORD`). `JWT_SECRET` is generated for you.
 4. Click **Apply**. The first build takes ~5-10 minutes.
-5. Check `https://ai-resume-builder-api.onrender.com/api/health` → `{"status":"ok"}`.
+5. Check `https://ai-resume-builder-api-o7gk.onrender.com/api/health` → `{"status":"ok"}`.
 
 If Render gives the service a different URL, update `CORS_ALLOWED_ORIGINS`/`FRONTEND_URL` there if needed,
 and set the GitHub repository variable `API_URL` (next section).
