@@ -633,6 +633,42 @@ form .banner { margin-bottom: 0; }
 .history-text strong { display: flex; align-items: center; gap: 6px; }
 .history-text .muted { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.9rem; }
 .history-date { color: var(--muted); font-size: 0.85rem; white-space: nowrap; }
+
+/* History table */
+.history-table-wrap { padding: 0; overflow-x: auto; }
+.history-table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+.history-table th {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.history-table td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.history-table tbody tr { cursor: pointer; transition: background 0.15s; }
+.history-table tbody tr:last-child td { border-bottom: none; }
+.history-table tbody tr:hover { background: var(--primary-soft); }
+.history-table .col-sno { width: 64px; color: var(--muted); font-weight: 600; text-align: center; }
+.history-table .col-file { font-weight: 600; white-space: nowrap; }
+.history-table .col-file svg { vertical-align: -2px; color: var(--muted); }
+.history-table .col-desc { max-width: 0; width: 100%; overflow: hidden; color: var(--muted); text-overflow: ellipsis; white-space: nowrap; }
+.history-table .col-score { text-align: center; white-space: nowrap; }
+.history-table .col-date { white-space: nowrap; }
+.history-table td.col-date strong { display: block; font-weight: 600; }
+.history-table td.col-date span { color: var(--muted); font-size: 0.84rem; }
+.history-table .col-open { text-align: right; white-space: nowrap; }
+.history-open { display: inline-flex; align-items: center; gap: 4px; color: var(--primary); font-weight: 600; text-decoration: none; }
+.history-open:hover { text-decoration: underline; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 760px) {
+  .history-table .col-desc { display: none; }
+  .history-table th, .history-table td { padding: 12px 10px; }
+}
 .badge {
   display: grid;
   place-items: center;

@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchHistory } from '../api.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import useDocumentTitle from '../hooks/useDocumentTitle.js';
 import emptyImage from '../assets/empty.svg';
 import { scoreLevel } from '../components/ScoreRing.jsx';
-import { FileIcon, SparkleIcon } from '../components/Icons.jsx';
+import { ArrowRightIcon, FileIcon, SparkleIcon } from '../components/Icons.jsx';
 
-function formatDate(iso) {
-  return new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-}
+const formatDate = (iso) => new Date(iso).toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
+const formatTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 /** /history - every analysis this user has saved. */
 export default function HistoryPage() {
   useDocumentTitle('History');
+  const navigate = useNavigate();
   const { handleAuthError } = useAuth();
   const [items, setItems] = useState(null);
   const [error, setError] = useState('');
@@ -51,23 +51,50 @@ export default function HistoryPage() {
         <h2>Your analyses</h2>
         <span className="muted">{items.length} saved</span>
       </div>
-      <ul className="history">
-        {items.map((item) => {
-          const { tone, label } = scoreLevel(item.matchScore);
-          return (
-            <li key={item.id}>
-              <Link to={`/analyses/${item.id}`} className="card history-item">
-                <span className={`badge badge-${tone}`} title={label}>{item.matchScore}</span>
-                <span className="history-text">
-                  <strong><FileIcon size={15} /> {item.resumeFileName}</strong>
-                  <span className="muted">{item.jobPreview}</span>
-                </span>
-                <span className="history-date">{formatDate(item.createdAt)}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="card history-table-wrap">
+        <table className="history-table">
+          <thead>
+            <tr>
+              <th className="col-sno">S.No</th>
+              <th>Resume</th>
+              <th>Job description</th>
+              <th className="col-score">Match score</th>
+              <th className="col-score">ATS score</th>
+              <th className="col-date">Date &amp; time</th>
+              <th className="col-open"><span className="sr-only">Open</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item, index) => {
+              const { tone, label } = scoreLevel(item.matchScore);
+              const ats = item.atsScore == null ? null : scoreLevel(item.atsScore);
+              const open = () => navigate(`/analyses/${item.id}`);
+              return (
+                <tr key={item.id} onClick={open}>
+                  <td className="col-sno">{index + 1}</td>
+                  <td className="col-file"><FileIcon size={15} /> {item.resumeFileName}</td>
+                  <td className="col-desc" title={item.jobPreview}>{item.jobPreview}</td>
+                  <td className="col-score">
+                    <span className={`badge badge-${tone}`} title={label}>{item.matchScore}</span>
+                  </td>
+                  <td className="col-score">
+                    {ats ? <span className={`badge badge-${ats.tone}`} title={ats.label}>{item.atsScore}</span> : <span className="muted">–</span>}
+                  </td>
+                  <td className="col-date">
+                    <strong>{formatDate(item.createdAt)}</strong>
+                    <span>{formatTime(item.createdAt)}</span>
+                  </td>
+                  <td className="col-open">
+                    <Link to={`/analyses/${item.id}`} onClick={(e) => e.stopPropagation()} className="history-open">
+                      View <ArrowRightIcon size={15} />
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

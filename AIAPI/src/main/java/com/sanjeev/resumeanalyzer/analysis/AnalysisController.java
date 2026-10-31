@@ -108,7 +108,7 @@ public class AnalysisController {
         Long userId = Long.valueOf(jwt.getSubject());
         return analyses.findTop50ByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(a -> new AnalysisSummary(a.getId(), a.getResumeFileName(), preview(a.getJobDescription()),
-                        a.getMatchScore(), a.getCreatedAt()))
+                        a.getMatchScore(), fromJson(a.getResultJson()).atsScore(), a.getCreatedAt()))
                 .toList();
     }
 

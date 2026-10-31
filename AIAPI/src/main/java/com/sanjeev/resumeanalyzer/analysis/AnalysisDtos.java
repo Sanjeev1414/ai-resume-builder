@@ -10,7 +10,8 @@ public final class AnalysisDtos {
     }
 
     /** Row in the history list. */
-    public record AnalysisSummary(Long id, String resumeFileName, String jobPreview, int matchScore, Instant createdAt) {
+    public record AnalysisSummary(Long id, String resumeFileName, String jobPreview, int matchScore, Integer atsScore,
+                                  Instant createdAt) {
     }
 
     /** Full saved analysis. */
