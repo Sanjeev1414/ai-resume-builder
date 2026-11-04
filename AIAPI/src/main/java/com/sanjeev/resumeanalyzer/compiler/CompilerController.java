@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 
 import java.time.Duration;
@@ -51,6 +52,14 @@ public class CompilerController {
         rateLimiter.check("compiler:" + currentUser.from(jwt).getId(), RUNS_PER_MINUTE, Duration.ofMinutes(1),
                 "You've reached the limit of " + RUNS_PER_MINUTE + " runs per minute. Please wait a moment.");
         return compiler.run(request.language(), request.code(), request.stdin());
+    }
+
+    /** Wandbox limits requests per address, and all users of this server share one address. */
+    @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
+    public ResponseEntity<Map<String, String>> compilerBusy(HttpClientErrorException.TooManyRequests e) {
+        log.warn("Online compiler rate limit reached");
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("error", "The free online compiler is busy right now. Please wait a few seconds and press Run again."));
     }
 
     /** Takes priority over the global handlers, whose messages are about the AI service. */

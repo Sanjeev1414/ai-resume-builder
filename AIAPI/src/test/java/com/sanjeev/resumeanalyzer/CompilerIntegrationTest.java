@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.Map;
@@ -70,6 +73,16 @@ class CompilerIntegrationTest {
         run(register(), Map.of("language", "java", "code", "class Main {}"))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.error").value("The online compiler is not responding. Please try again in a moment."));
+    }
+
+    @Test
+    void compilerRateLimitAsksTheUserToWait() throws Exception {
+        when(compiler.run(eq("python"), any(), any())).thenThrow(
+                HttpClientErrorException.create(HttpStatus.TOO_MANY_REQUESTS, "Too Many Requests", HttpHeaders.EMPTY, new byte[0], null));
+
+        run(register(), Map.of("language", "python", "code", "print(1)"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.error").value("The free online compiler is busy right now. Please wait a few seconds and press Run again."));
     }
 
     private ResultActions run(String token, Map<String, String> body) throws Exception {

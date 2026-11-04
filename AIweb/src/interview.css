@@ -26,6 +26,8 @@
 /* Both cards share one height, and the compiler always fits on screen with its output visible */
 .iq-grid { --iq-card-h: max(560px, calc(100vh - var(--header-h) - 32px)); }
 .iq-questions { min-width: 0; min-height: var(--iq-card-h); }
+/* Without this, long code lines stretch a card until it slides under the compiler */
+.iq-questions .qa-list { grid-template-columns: minmax(0, 1fr); }
 .iq-compiler { position: sticky; top: calc(var(--header-h) + 16px); min-width: 0; height: var(--iq-card-h); scroll-margin-top: calc(var(--header-h) + 16px); }
 
 .tag-basic, .tag-easy { background: var(--accent-soft); color: var(--accent-text); }
