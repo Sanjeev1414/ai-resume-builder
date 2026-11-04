@@ -55,6 +55,13 @@ export const ChevronIcon = (p) => <Icon {...p}><path d="M6 9l6 6 6-6" /></Icon>;
 export const GridIcon = (p) => (
   <Icon {...p}><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></Icon>
 );
+export const CodeIcon = (p) => <Icon {...p}><path d="M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14" /></Icon>;
+export const DatabaseIcon = (p) => (
+  <Icon {...p}><ellipse cx="12" cy="6" rx="8" ry="3" /><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></Icon>
+);
+export const PlayIcon = (p) => <Icon {...p}><path d="M7 4l13 8-13 8z" /></Icon>;
+export const RefreshIcon = (p) => <Icon {...p}><path d="M20 11a8 8 0 00-14-4.5L4 8M4 4v4h4M4 13a8 8 0 0014 4.5l2-1.5M20 20v-4h-4" /></Icon>;
+export const TerminalIcon = (p) => <Icon {...p}><path d="M5 7l5 5-5 5M12 18h7" /></Icon>;
 export const MenuIcon = (p) => <Icon {...p}><path d="M4 6h16M4 12h16M4 18h16" /></Icon>;
 export const BriefcaseIcon = (p) => (
   <Icon {...p}><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M3 13h18" /></Icon>

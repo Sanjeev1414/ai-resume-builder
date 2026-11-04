@@ -11,6 +11,7 @@ import AnalysisPage from './pages/AnalysisPage.jsx';
 import ChangePasswordPage from './pages/ChangePasswordPage.jsx';
 import CoverLetterPage from './pages/CoverLetterPage.jsx';
 import InterviewPrepPage from './pages/InterviewPrepPage.jsx';
+import InterviewTopicPage from './pages/InterviewTopicPage.jsx';
 import JobTrackerPage from './pages/JobTrackerPage.jsx';
 import ResumeBuilderPage from './pages/ResumeBuilderPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/analyses/:id" element={<AnalysisPage />} />
           <Route path="/cover-letter" element={<CoverLetterPage />} />
           <Route path="/interview-prep" element={<InterviewPrepPage />} />
+          <Route path="/interview/:topic" element={<InterviewTopicPage />} />
           <Route path="/resume-builder" element={<ResumeBuilderPage />} />
           <Route path="/job-tracker" element={<JobTrackerPage />} />
           <Route path="/account/password" element={<ChangePasswordPage />} />

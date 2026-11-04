@@ -7,6 +7,7 @@ import './styles.css';
 import './app-extras.css';
 import './layout.css';
 import './features.css';
+import './interview.css';
 import './theme.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -108,6 +108,9 @@ export const fetchInterviewPreps = () => request('/api/interview-prep');
 export const fetchInterviewPrep = (id) => request(`/api/interview-prep/${id}`);
 export const deleteInterviewPrep = (id) => request(`/api/interview-prep/${id}`, { method: 'DELETE' });
 
+// --- Online compiler ---
+export const runCode = ({ language, code, stdin }) => sendJson('POST', '/api/compiler/run', { language, code, stdin });
+
 // --- Job tracker ---
 export const fetchApplications = () => request('/api/applications');
 export const createApplication = (data) => sendJson('POST', '/api/applications', data);

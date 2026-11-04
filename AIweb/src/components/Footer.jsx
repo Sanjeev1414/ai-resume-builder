@@ -16,7 +16,7 @@ const QUOTES = [
 
 const ROTATE_MS = 30_000;
 
-/** Footer: a motivational quote that changes every 30 seconds. */
+/** Footer: a motivational quote that changes every 30 seconds, plus the copyright line. */
 export default function Footer() {
   // Start on a different quote each day
   const [index, setIndex] = useState(() => Math.floor(Date.now() / 86_400_000) % QUOTES.length);
@@ -34,6 +34,7 @@ export default function Footer() {
         <blockquote>{quote.text}</blockquote>
         <figcaption>- {quote.author}</figcaption>
       </figure>
+      <span className="footer-copy">© {new Date().getFullYear()} ResumeAI · Sanjeev Nandihalli</span>
     </footer>
   );
 }

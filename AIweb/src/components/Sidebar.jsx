@@ -2,7 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import logo from '../assets/logo.svg';
 import { useAuth } from '../auth/AuthContext.jsx';
 import {
-  BriefcaseIcon, ClockIcon, EditIcon, GridIcon, KeyIcon, LayoutIcon, MicIcon, XIcon,
+  BriefcaseIcon, ClockIcon, CodeIcon, DatabaseIcon, EditIcon, GridIcon, KeyIcon, LayoutIcon, MicIcon, TargetIcon, XIcon,
 } from './Icons.jsx';
 
 /** Add a page here and it shows up in the sidebar. */
@@ -21,6 +21,18 @@ const NAV_SECTIONS = [
       { to: '/resume-builder', label: 'Resume Builder', icon: LayoutIcon },
       { to: '/job-tracker', label: 'Job Tracker', icon: BriefcaseIcon },
       { to: '/history', label: 'Analysis History', icon: ClockIcon },
+    ],
+  },
+  {
+    title: 'Interview Preparation',
+    items: [
+      { to: '/interview/java', label: 'Java', icon: CodeIcon },
+      { to: '/interview/sql', label: 'SQL', icon: DatabaseIcon },
+      { to: '/interview/python', label: 'Python', icon: CodeIcon },
+      { to: '/interview/html', label: 'HTML', icon: CodeIcon },
+      { to: '/interview/css', label: 'CSS', icon: CodeIcon },
+      { to: '/interview/react', label: 'React', icon: CodeIcon },
+      { to: '/interview/dsa', label: 'DSA', icon: TargetIcon },
     ],
   },
   {

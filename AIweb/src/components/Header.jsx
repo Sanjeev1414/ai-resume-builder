@@ -7,6 +7,7 @@ const PAGES = [
   ['/dashboard', 'Resume Analyzer', 'Match your resume to a job and pass ATS filters'],
   ['/cover-letter', 'Cover Letter', 'Generate a tailored cover letter in seconds'],
   ['/interview-prep', 'Interview Prep', 'Practice the questions you are likely to be asked'],
+  ['/interview/', 'Interview Preparation', 'Practice common questions and run code in the online compiler'],
   ['/resume-builder', 'Resume Builder', 'Build an ATS-friendly resume and download it as PDF'],
   ['/job-tracker', 'Job Tracker', 'Keep every application organised in one place'],
   ['/history', 'Analysis History', 'All your saved resume reports'],
